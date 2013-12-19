@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Wheel-soil by melanz</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Wheel-soil</h1>
+        <p>MATLAB implementation of Wong-Reece terramechanics.</p>
+
+        <p class="view"><a href="https://github.com/melanz/wheel-soil">View the Project on GitHub <small>melanz/wheel-soil</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/melanz/wheel-soil/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/melanz/wheel-soil/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/melanz/wheel-soil">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="wheel-soil" class="anchor" href="#wheel-soil"><span class="octicon octicon-link"></span></a>wheel-soil</h1>
+
+<p>The rigid wheel free-body diagram based on the work of Wong and Reece [1], shown in the figure below, is used to model the interaction between the wheel and the soil. Using this model, the drawbar pull D, torque T, and sinkage z, can be estimated for a wheel of weight W, radius r, and wheel width b, travelling at a linear velocity v.</p>
+
+<p><img src="https://f.cloud.github.com/assets/5438923/1746579/5dd61358-6444-11e3-9ba1-7be07cad128d.png" alt="wheelsoil"></p>
+
+<p>[1] J. Wong and A. Reece, “Prediction of rigid wheel performance based on the analysis of soil-wheel stresses part I. Performance of driven rigid wheels,” J. Terramechanics, vol. 4, no. 1, 1967.</p>
+
+<h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">phi</span> <span class="o">=</span> <span class="mf">34.74</span><span class="p">;</span>       <span class="o">%</span> <span class="nx">angle</span> <span class="nx">of</span> <span class="nx">friction</span><span class="p">,</span> <span class="nx">degrees</span>       
+<span class="nx">c</span> <span class="o">=</span> <span class="mf">139.28</span><span class="p">;</span>        <span class="o">%</span> <span class="nx">cohesion</span>         
+<span class="nx">K</span> <span class="o">=</span> <span class="mf">5.15</span><span class="nx">e</span><span class="o">-</span><span class="mi">4</span><span class="p">;</span>     <span class="o">%</span> <span class="nx">shear</span> <span class="nx">modulus</span>
+<span class="nx">k_eq</span> <span class="o">=</span> <span class="mf">2.54e5</span><span class="p">;</span>     <span class="o">%</span> <span class="nx">pressure</span><span class="o">-</span><span class="nx">sinkage</span> <span class="nx">modulus</span>
+<span class="nx">n</span> <span class="o">=</span> <span class="mf">1.387</span><span class="p">;</span>           <span class="o">%</span> <span class="nx">exponent</span> <span class="nx">of</span> <span class="nx">sinkage</span> <span class="nx">to</span> <span class="nx">width</span>
+<span class="nx">theta_2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>       <span class="o">%</span> <span class="nx">exit</span> <span class="nx">angle</span> <span class="p">(</span><span class="nx">assumed</span><span class="p">)</span>
+<span class="nx">r</span> <span class="o">=</span> <span class="p">.</span><span class="mi">13</span><span class="p">;</span>            <span class="o">%</span> <span class="nx">wheel</span> <span class="nx">radius</span>
+<span class="nx">b</span> <span class="o">=</span> <span class="p">.</span><span class="mi">16</span><span class="p">;</span>            <span class="o">%</span> <span class="nx">wheel</span> <span class="nx">width</span>
+<span class="nx">W</span> <span class="o">=</span> <span class="mi">130</span><span class="p">;</span>         <span class="o">%</span> <span class="nx">wheel</span> <span class="nx">weight</span>
+
+<span class="o">%</span> <span class="nx">Coefficients</span> <span class="k">for</span> <span class="nx">determining</span> <span class="nx">the</span> <span class="nx">relative</span> <span class="nx">position</span> <span class="nx">of</span> <span class="nx">max</span><span class="p">.</span> <span class="nx">radial</span> <span class="nx">stress</span>
+<span class="nx">c_1</span> <span class="o">=</span> <span class="mf">0.43</span><span class="p">;</span>
+<span class="nx">c_2</span> <span class="o">=</span> <span class="mf">0.32</span><span class="p">;</span>
+
+<span class="o">%</span> <span class="nx">Create</span> <span class="nx">the</span> <span class="nx">WheelSoil</span> <span class="nx">object</span>
+<span class="nx">test</span> <span class="o">=</span> <span class="nx">WheelSoil</span><span class="p">(</span><span class="nx">slip</span><span class="p">,</span><span class="nx">k_eq</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">phi</span><span class="p">,</span><span class="nx">K</span><span class="p">,</span><span class="nx">c_1</span><span class="p">,</span><span class="nx">c_2</span><span class="p">,</span><span class="nx">W</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">theta_2</span><span class="p">);</span>
+
+<span class="nx">guess</span> <span class="o">=</span> <span class="mf">0.4058</span><span class="p">;</span>
+<span class="p">[</span><span class="nx">H</span><span class="p">,</span><span class="nx">R</span><span class="p">,</span><span class="nx">D</span><span class="p">,</span><span class="nx">T</span><span class="p">,</span><span class="nx">z</span><span class="p">]</span> <span class="o">=</span> <span class="nx">test</span><span class="p">.</span><span class="nx">calculateWheelPerformance</span><span class="p">(</span><span class="nx">slip</span><span class="p">,</span><span class="nx">k_eq</span><span class="p">,</span><span class="nx">n</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">phi</span><span class="o">*</span><span class="nx">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span><span class="nx">K</span><span class="p">,</span><span class="nx">c_1</span><span class="p">,</span><span class="nx">c_2</span><span class="p">,</span><span class="nx">W</span><span class="p">,</span><span class="nx">r</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">theta_2</span><span class="o">*</span><span class="nx">pi</span><span class="o">/</span><span class="mi">180</span><span class="p">,</span><span class="nx">guess</span><span class="p">);</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/melanz">melanz</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
