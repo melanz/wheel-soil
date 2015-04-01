@@ -30,12 +30,11 @@ classdef WheelSoil < handle
         theta_m = 0;
         
         z_0 = 0;                    % maximum sinkage, m
-        b_plate = 1;
     end
     
     methods
         % Constructor for the WheelSoil class (contains the variables)
-        function TS = WheelSoil(i,keq,n,c,phi,K,c1,c2,Fz,r,b,theta2,b_plate)
+        function TS = WheelSoil(i,keq,n,c,phi,K,c1,c2,Fz,r,b,theta2)
             TS.phi_degree = phi;    % angle of internal shearing resistance
             TS.phi = 0;
             TS.c = c;               % cohesion, Pa
@@ -65,14 +64,13 @@ classdef WheelSoil < handle
             TS.z_0 = 0;
             TS.slip = i;
             TS.phi = TS.phi_degree*pi/180;
-            TS.b_plate = b_plate;
         end
         
         % Get the normal stress along the front of the wheel for a given
         % angle
         function sigma_1 = getSigma1(TS,theta)
             z = (cos(theta)-cos(TS.theta_1))*TS.r;
-            sigma_1 = TS.k_1.*(z./TS.b_plate).^TS.n; % k_1 is k_eq here
+            sigma_1 = TS.k_1.*(z./TS.b).^TS.n; % k_1 is k_eq here
         end
         
         % Get the normal stress along the back of the wheel for a given
@@ -81,7 +79,7 @@ classdef WheelSoil < handle
             z = (cos(TS.theta_1-((theta-TS.theta_2)/...
                 (TS.theta_m-TS.theta_2))*(TS.theta_1-TS.theta_m))...
                 -cos(TS.theta_1))*TS.r;
-            sigma_2 = TS.k_1.*(z./TS.b_plate).^TS.n; % k_1 is k_eq here
+            sigma_2 = TS.k_1.*(z./TS.b).^TS.n; % k_1 is k_eq here
         end
         
         % Get the normal stress at any angle on the wheel
@@ -152,7 +150,7 @@ classdef WheelSoil < handle
         % Calculate the wheel performance for a given set of soil
         % parameters
         function [H,R,D,T,z] = calculateWheelPerformance(TS,slip,keq,n,c,...
-                phi,K,c1,c2,Fz,r,b,theta2,b_plate,guess)
+                phi,K,c1,c2,Fz,r,b,theta2,guess)
             TS.slip = slip;
             TS.k_1 = keq;
             TS.n = n;
@@ -165,13 +163,14 @@ classdef WheelSoil < handle
             TS.r = r;
             TS.b = b;
             TS.theta_2 = theta2;
-            TS.b_plate = b_plate;
+
             radius = r;
             width = b;
             
             % Calculate the entrance angle (assuming an exit angle)
             options = optimset('Jacobian','off','Display','on');
-            theta_c = fsolve(@TS.errorFunction,guess,options);
+            f = @(theta_c) TS.errorFunction(theta_c);
+            theta_c = fsolve(f,guess,options);
             TS.theta_1 = theta_c;
             TS.theta_m = (TS.c_1+TS.c_2*TS.slip)*TS.theta_1;
             TS.z_0 = (1-cos(TS.theta_1))*TS.r;
